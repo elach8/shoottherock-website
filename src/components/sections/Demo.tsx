@@ -9,18 +9,17 @@ export default function Demo() {
       subtitle="Watch a real workout against an NBA legend. No narration. No explanation. Just the game."
     >
       <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0B0B0D] shadow-2xl">
-        <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-          <div className="text-center">
-            <div className="mb-6 text-6xl">▶️</div>
-
-            <h3 className="text-3xl font-black">Demo Video Coming Soon</h3>
-
-            <p className="mt-4 text-zinc-400">
-              This placeholder will become your marketing video.
-            </p>
-          </div>
-        </div>
-      </div>
+  <video
+    className="w-full aspect-video"
+    controls
+    playsInline
+    preload="metadata"
+    poster="/ShootTheRockVideoPoster.png"
+  >
+    <source src="/ShootTheRockGameplay720.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
     </Section>
   );
 }
