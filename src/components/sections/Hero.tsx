@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Button from "@/components/Button";
-import { BRAND } from "@/lib/brand";
 
 export default function Hero() {
   return (
@@ -9,18 +8,23 @@ export default function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2">
         {/* LEFT SIDE */}
-
         <div>
           <div className="mb-6 inline-flex rounded-full border border-orange-500/40 bg-orange-500/10 px-4 py-2 text-xs font-black tracking-[0.25em] text-orange-400">
-            {BRAND.name}
+            BEAT A LEGEND
           </div>
 
           <h1 className="max-w-3xl text-6xl font-black leading-[0.88] tracking-[-0.06em] sm:text-7xl md:text-8xl">
-            {BRAND.copy.heroTitle}
+            Lace up against legends.
+            <span className="block text-orange-500">
+              Beat them at their own game.
+            </span>
           </h1>
 
           <p className="mt-7 max-w-2xl text-lg leading-8 text-zinc-400 sm:text-xl">
-            {BRAND.copy.heroSubtitle}
+            Face the greatest shooters in basketball history. ShootTheRock
+            recreates their real shot selection, locations, and shooting
+            percentages, challenging you to match their performance one
+            possession at a time.
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -30,7 +34,6 @@ export default function Hero() {
         </div>
 
         {/* RIGHT SIDE */}
-
         <div className="relative flex justify-center">
           <div className="absolute inset-0 rounded-full bg-orange-500/15 blur-[140px]" />
 

@@ -21,9 +21,10 @@ export default function Home() {
       <Navbar />
 
       <Hero />
-      <Demo />
-      <WhyShootTheRock />
       <BeatALegend />
+      <Demo />
+      
+      
       <Analytics />
       <Health />
       <Hardware />

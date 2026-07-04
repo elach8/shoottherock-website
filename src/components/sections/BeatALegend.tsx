@@ -6,39 +6,59 @@ export default function BeatALegend() {
     <Section
       id="beat-a-legend"
       eyebrow="Beat a Legend"
-      title="Every shot has a purpose."
-      subtitle="ShootTheRock turns your workout into a live game against NBA legends, with shot locations, shot types, scoring, and commentary driving every possession."
+      title="How the game works."
+      subtitle="Every possession mirrors the tendencies of a basketball legend. Listen for the call, perform the move, and see how your game stacks up."
     >
-      <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0B0B0D] shadow-2xl shadow-black/50">
-          <Image
-            src="/images/gameplay/live-session.png"
-            alt="ShootTheRock live Beat a Legend session"
-            width={1170}
-            height={2532}
-            className="h-auto w-full"
-          />
+      <div className="mx-auto max-w-5xl">
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center">
+          <h3 className="text-3xl font-black">
+            Listen. Shoot. Say the result.
+          </h3>
+
+          <p className="mt-6 text-lg leading-8 text-zinc-400">
+            Your earbuds call out a shot type and court location. Perform the
+            move, take the shot, then say your personalized make or miss word.
+            ShootTheRock logs the outcome, updates the score, and tracks your
+            field goal percentage by region and shot type along with heart rate
+            and calories burned.
+          </p>
+
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            <div>
+              <div className="text-5xl">🎧</div>
+              <h4 className="mt-4 text-xl font-bold">Listen</h4>
+              <p className="mt-2 text-sm leading-7 text-zinc-400">
+                Hear the shot type and court location in your earbuds.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-5xl">🏀</div>
+              <h4 className="mt-4 text-xl font-bold">Shoot</h4>
+              <p className="mt-2 text-sm leading-7 text-zinc-400">
+                Perform the move and take the shot.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-5xl">💬</div>
+              <h4 className="mt-4 text-xl font-bold">Speak</h4>
+              <p className="mt-2 text-sm leading-7 text-zinc-400">
+                Say your make or miss word to log the result.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-            <h3 className="text-3xl font-black">Can you beat Kobe?</h3>
-            <p className="mt-4 leading-8 text-zinc-400">
-              The app calls out your next shot, tracks your makes and misses,
-              and keeps the score while you play.
-            </p>
-          </div>
-
-          <div className="flex justify-center">
-            <div className="overflow-hidden rounded-[34px] border-4 border-zinc-800 shadow-2xl">
-  <Image
-    src="/images/gameplay/watch.png"
-    alt="Apple Watch gameplay prompt"
-    width={410}
-    height={512}
-    className="block h-auto w-auto"
-  />
-</div>
+        <div className="mt-10 flex justify-center">
+          <div className="overflow-hidden rounded-[34px] border-4 border-zinc-800 shadow-2xl">
+            <Image
+              src="/images/gameplay/watch.png"
+              alt="Apple Watch gameplay prompt"
+              width={410}
+              height={512}
+              className="block h-auto w-auto"
+            />
           </div>
         </div>
       </div>
