@@ -10,7 +10,7 @@ export default function Hero() {
         {/* LEFT SIDE */}
         <div>
           <div className="mb-6 inline-flex rounded-full border border-orange-500/40 bg-orange-500/10 px-4 py-2 text-xs font-black tracking-[0.25em] text-orange-400">
-            BEAT A LEGEND
+            ShootTheRock
           </div>
 
           <h1 className="max-w-3xl text-6xl font-black leading-[0.88] tracking-[-0.06em] sm:text-7xl md:text-8xl">

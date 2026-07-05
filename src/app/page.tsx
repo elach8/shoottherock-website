@@ -27,7 +27,7 @@ export default function Home() {
       
       <Analytics />
       <Health />
-      <Hardware />
+      
       <Future />
       <Download />
       <Footer />
