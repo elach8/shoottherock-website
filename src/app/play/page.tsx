@@ -86,14 +86,10 @@ export default function PlayPage() {
 
         <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center">
           <p className="text-base font-semibold leading-7 text-white sm:text-xl">
-            Shoot The Rock was created by a local hooper who believes basketball
-            is more fun when every shot means something.
-          </p>
+                Shoot The Rock was created by a local hooper. If you know someone who'd love
+                competing against basketball legends, please help us spread the word.
+            </p>
 
-          <p className="mt-4 text-sm leading-6 text-white/70 sm:text-base">
-            If you know someone who&apos;d love competing against basketball
-            legends, help us spread the word.
-          </p>
 
           <button
             type="button"
