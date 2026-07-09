@@ -1,20 +1,31 @@
-// app/play/page.tsx
-
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { logPromoEvent } from "./actions";
 
 export default function PlayPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
 
+  const getTrackingParams = () => {
+    const params = new URLSearchParams(window.location.search);
+
+    return {
+      stickerCode: params.get("src"),
+      visitorId: params.get("v"),
+    };
+  };
+
   const playVideo = async () => {
     const video = videoRef.current;
     if (!video) return;
 
+    const { stickerCode, visitorId } = getTrackingParams();
+
     setHasStarted(true);
+    logPromoEvent(stickerCode, visitorId, "video_started");
+
     video.muted = false;
     video.controls = true;
     await video.play();
@@ -51,6 +62,9 @@ export default function PlayPage() {
             preload="metadata"
             poster="/shoot-the-rock-landscape-logo.png"
             onEnded={() => {
+              const { stickerCode, visitorId } = getTrackingParams();
+              logPromoEvent(stickerCode, visitorId, "video_completed");
+
               if (videoRef.current) {
                 videoRef.current.controls = false;
               }
@@ -71,6 +85,10 @@ export default function PlayPage() {
         <div className="mt-7 flex flex-col gap-4">
           <a
             href="YOUR_APP_STORE_LINK_HERE"
+            onClick={() => {
+              const { stickerCode, visitorId } = getTrackingParams();
+              logPromoEvent(stickerCode, visitorId, "app_store_clicked");
+            }}
             className="rounded-full bg-orange-500 px-8 py-4 text-center text-lg font-black text-black transition hover:bg-orange-400"
           >
             Download on the App Store
@@ -86,10 +104,10 @@ export default function PlayPage() {
 
         <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center">
           <p className="text-base font-semibold leading-7 text-white sm:text-xl">
-                Shoot The Rock was created by a local hooper. If you know someone who'd love
-                competing against basketball legends, please help us spread the word.
-            </p>
-
+            Shoot The Rock was created by a local hooper. If you know someone
+            who&apos;d love competing against basketball legends, please help us
+            spread the word.
+          </p>
 
           <button
             type="button"
