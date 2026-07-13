@@ -16,7 +16,7 @@ export async function GET(
     referrer: request.headers.get("referer"),
   });
 
-  const redirectUrl = new URL("/play", request.url);
+  const redirectUrl = new URL("/", request.url);
   redirectUrl.searchParams.set("src", stickerCode);
   redirectUrl.searchParams.set("v", visitorId);
 
