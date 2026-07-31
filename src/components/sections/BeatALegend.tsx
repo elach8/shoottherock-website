@@ -7,7 +7,7 @@ export default function BeatALegend() {
       id="beat-a-legend"
       eyebrow="Gameplay"
       title="How the game works."
-      subtitle="All you need is your iPhone, Apple Watch, earbuds, and a basketball. Then it's time to see how your game stacks up against basketball legends."
+      subtitle="All you need is your iPhone, Apple Watch, wireless earbuds, and a basketball. Then it's time to see how your game stacks up against basketball legends."
     >
       <div className="mx-auto max-w-5xl">
         {/* Setup */}

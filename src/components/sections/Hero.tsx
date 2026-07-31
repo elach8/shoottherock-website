@@ -158,7 +158,13 @@ export default function Hero() {
             className="mt-10 flex justify-start"
             onClick={handleAppStoreClick}
           >
-            <Button>Download Soon</Button>
+            <Button
+              href="https://apps.apple.com/us/app/shoottherock/id6776022876"
+              target="_blank"
+              rel="noopener noreferrer"
+            > 
+              Download on the App Store
+            </Button>
           </div>
         </div>
       </div>

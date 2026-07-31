@@ -34,12 +34,13 @@ export default function Hardware() {
 
       <div className="mt-8 rounded-[2rem] border border-orange-500/30 bg-orange-500/10 p-6 sm:p-8">
         <h3 className="text-xl font-black text-orange-400 sm:text-2xl">
-          Coming Soon: Sensor Tracking
+          Planned Feature: Sensor Tracking
         </h3>
 
         <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-300 sm:text-base sm:leading-8">
-          The optional ShootTheRock vest and sensors will add automatic shot
-          location tracking for players who want the full pro experience.
+          We're developing an optional ShootTheRock vest and sensor system that
+          will automatically detect your shot location, making gameplay even
+          more seamless for players who want the ultimate training experience.
         </p>
       </div>
     </Section>

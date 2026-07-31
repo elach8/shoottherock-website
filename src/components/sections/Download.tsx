@@ -26,12 +26,17 @@ export default function Download() {
         </h3>
 
         <p className="mx-auto mt-4 max-w-2xl leading-8 text-zinc-300">
-          App Store launch coming soon. For now, follow development and get ready
-          to run it back.
+          Now available on the App Store. Download today and start competing
+          against basketball legends while improving your real game.
         </p>
 
         <div className="mt-8">
-          <Button>Download Soon</Button>
+          <Button
+            href="https://apps.apple.com/us/app/shoottherock/id6776022876"
+            
+          >
+            Download on the App Store
+          </Button>
         </div>
       </div>
     </Section>

@@ -52,7 +52,9 @@ export default function Navbar() {
 
         {/* Download Button */}
         <a
-          href="/#download"
+          href="https://apps.apple.com/us/app/shoottherock/id6776022876"
+          target="_blank"
+          rel="noopener noreferrer"
           className="shrink-0 rounded-full bg-orange-500 px-5 py-3 text-sm font-black text-black transition hover:bg-orange-400 sm:px-7 sm:py-4 sm:text-base"
         >
           Download

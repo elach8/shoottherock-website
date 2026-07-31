@@ -4,7 +4,6 @@ export default function Footer() {
   return (
     <footer className="border-t border-white/10 px-6 py-12">
       <div className="mx-auto flex max-w-7xl flex-col gap-10 md:flex-row md:items-center md:justify-between">
-
         <div className="flex items-center gap-4">
           <Image
             src="/images/app-icon.png"
@@ -38,6 +37,15 @@ export default function Footer() {
             className="text-zinc-400 transition hover:text-orange-400"
           >
             Privacy Policy
+          </a>
+
+          <a
+            href="https://apps.apple.com/us/app/shoottherock/id6776022876"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-zinc-400 transition hover:text-orange-400"
+          >
+            App Store
           </a>
 
           <a
