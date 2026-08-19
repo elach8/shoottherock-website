@@ -13,18 +13,39 @@ export default function AdminLayout({
           <div className="mt-1 text-sm text-white/50">Admin</div>
 
           <nav className="mt-10 flex flex-col gap-3 text-sm font-bold">
-            <Link href="/admin" className="rounded-xl px-3 py-2 hover:bg-white/10">
+            <Link
+              href="/admin"
+              className="rounded-xl px-3 py-2 hover:bg-white/10"
+            >
               Dashboard
             </Link>
-            <Link href="/admin/install" className="rounded-xl px-3 py-2 hover:bg-white/10">
-                Install Sticker
+
+            <Link
+              href="/admin/install"
+              className="rounded-xl px-3 py-2 hover:bg-white/10"
+            >
+              Install Sticker
             </Link>
-            
-            <Link href="/admin/stickers" className="rounded-xl px-3 py-2 hover:bg-white/10">
+
+            <Link
+              href="/admin/stickers"
+              className="rounded-xl px-3 py-2 hover:bg-white/10"
+            >
               Stickers
             </Link>
-            <Link href="/admin/analytics" className="rounded-xl px-3 py-2 hover:bg-white/10">
+
+            <Link
+              href="/admin/analytics"
+              className="rounded-xl px-3 py-2 hover:bg-white/10"
+            >
               Analytics
+            </Link>
+
+            <Link
+              href="/admin/reels"
+              className="rounded-xl px-3 py-2 hover:bg-white/10"
+            >
+              Reels
             </Link>
           </nav>
         </aside>
