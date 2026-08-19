@@ -80,12 +80,12 @@ export default function ReelsFeed({ reels }: { reels: Reel[] }) {
       setHasSwiped(true);
     }
   }}
-  className="h-screen snap-y snap-mandatory overflow-y-scroll bg-black"
+  className="h-[100dvh] snap-y snap-mandatory overflow-y-scroll bg-black"
 >
       {infiniteReels.map((reel, index) => (
         <section
           key={`${reel.id}-${index}`}
-          className="relative flex h-screen snap-start items-center justify-center bg-black"
+          className="relative flex h-[100dvh] snap-start items-center justify-center bg-black"
         >
           <video
             ref={(element) => {
