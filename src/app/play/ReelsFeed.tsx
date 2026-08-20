@@ -151,13 +151,7 @@ export default function ReelsFeed({ reels }: { reels: Reel[] }) {
 </Link>
 
 
-          <div className="absolute bottom-8 left-4 right-4 z-10">
-            <div className="max-w-xl">
-              <h2 className="text-xl font-black">{reel.title}</h2>
-
-              
-            </div>
-          </div>
+          
 
          {index === 0 && !hasSwiped && (
   <div className="pointer-events-none absolute bottom-24 left-1/2 z-10 -translate-x-1/2 text-center">
