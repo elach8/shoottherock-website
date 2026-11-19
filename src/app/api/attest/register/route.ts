@@ -130,12 +130,17 @@ export async function POST(request: Request) {
         challenge,
         environment
       );
-    } catch {
-      return jsonError(
-        "App Attest verification failed.",
-        403
-      );
-    }
+    } catch (error) {
+  console.error(
+    "App Attest verification failed:",
+    error instanceof Error ? error.message : "Unknown error"
+  );
+
+  return jsonError(
+    "App Attest verification failed.",
+    403
+  );
+}
 
     const supabase = getAISupabaseAdmin();
 
