@@ -91,8 +91,8 @@ export async function POST(request: Request) {
     const clientDataHash = sha256(decodeBase64(challenge));
 
     const signedData = Buffer.concat([
-      authenticatorData,
-      clientDataHash,
+    authenticatorData,
+    sha256(clientDataHash),
     ]);
 
     const publicKey = createPublicKey(installation.public_key);
