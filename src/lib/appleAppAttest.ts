@@ -118,6 +118,8 @@ function readElement(
   };
 }
 
+
+
 function certificateNonce(der: Buffer): Buffer {
   const cert = new ParsedCertificate(
     Uint8Array.from(der).buffer
@@ -129,29 +131,49 @@ function certificateNonce(der: Buffer): Buffer {
 
   check(extension, "Missing Apple nonce extension");
 
-  const encoded = Buffer.from(extension.value);
-  const seq = readElement(encoded, 0);
+  let encoded = Buffer.from(extension.value);
+
+  // The certificate library may retain the outer
+  // OCTET STRING around the extension contents.
+  let element = readElement(encoded, 0);
+
+  if (
+    element.tag === 0x04 &&
+    element.next === encoded.length
+  ) {
+    encoded = Buffer.from(element.value);
+    element = readElement(encoded, 0);
+  }
 
   check(
-    seq.tag === 0x30 && seq.next === encoded.length,
+    element.tag === 0x30 &&
+      element.next === encoded.length,
     "Invalid Apple nonce sequence"
   );
 
-  const octet = readElement(seq.value, 0);
+  // Apple's nonce is carried in a context-specific
+  // [1] wrapper containing a 32-byte OCTET STRING.
+  const context = readElement(element.value, 0);
 
   check(
-    octet.tag === 0x04 &&
-      octet.next === seq.value.length,
+    context.tag === 0xa1 &&
+      context.next === element.value.length,
+    "Invalid Apple nonce context"
+  );
+
+  const nonce = readElement(context.value, 0);
+
+  check(
+    nonce.tag === 0x04 &&
+      nonce.next === context.value.length &&
+      nonce.value.length === 32,
     "Invalid Apple nonce encoding"
   );
 
-  check(
-    octet.value.length === 32,
-    "Invalid Apple nonce size"
-  );
-
-  return octet.value;
+  return nonce.value;
 }
+
+
 
 function verifyChain(
   certificates: Buffer[]
