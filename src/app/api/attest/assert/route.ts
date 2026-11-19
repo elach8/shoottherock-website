@@ -95,10 +95,7 @@ export async function POST(request: Request) {
       clientDataHash,
     ]);
 
-    const publicKey = createPublicKey({
-      key: JSON.parse(installation.public_key),
-      format: "jwk",
-    });
+    const publicKey = createPublicKey(installation.public_key);
 
     const valid = verify(
       "sha256",
