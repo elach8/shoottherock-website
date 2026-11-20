@@ -114,13 +114,13 @@ export async function POST(request: Request) {
     }
 
     const { error: updateError } = await supabase
-      .from("ai_app_installations")
-      .update({
-        sign_count: counter,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", installation.id)
-      .lt("sign_count", counter);
+  .from("ai_app_installations")
+  .update({
+    sign_count: counter,
+    last_seen_at: new Date().toISOString(),
+  })
+  .eq("id", installation.id)
+  .lt("sign_count", counter);
 
     if (updateError) {
       return NextResponse.json(
