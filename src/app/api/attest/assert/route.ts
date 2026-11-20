@@ -90,19 +90,21 @@ export async function POST(request: Request) {
 
     const clientDataHash = sha256(decodeBase64(challenge));
 
-    const signedData = Buffer.concat([
+    const nonce = sha256(
+  Buffer.concat([
     authenticatorData,
-    sha256(clientDataHash),
-    ]);
+    clientDataHash,
+  ])
+);
 
     const publicKey = createPublicKey(installation.public_key);
 
     const valid = verify(
-      "sha256",
-      signedData,
-      publicKey,
-      signature
-    );
+  "sha256",
+  nonce,
+  publicKey,
+  signature
+);
 
     if (!valid) {
       return NextResponse.json(
