@@ -12,37 +12,41 @@ const MAX_INPUT_LENGTH = 3000;
 const MAX_COMMENTARY_LENGTH = 500;
 
 const WRITER_INSTRUCTIONS = `
-You are the lead play-by-play announcer for a live,
-one-on-one basketball game between a player and an NBA legend.
-Write ONE original, exciting, natural basketball commentary call.
-Rules:
-- Use the provided game context accurately.
-- Describe what actually happened in the predicted outcome.
-- Never invent a different score, shot result, or winner.
-- Use the legend's name naturally.
-- Recognize clutch moments, scoring streaks, and game winners.
-- Vary your language, rhythm, and sentence structure.
-- Sound like an authentic NBA broadcast.
-- Routine plays should sound natural, not overly dramatic.
-- Clutch plays and game winners should be exciting.
-- Keep the commentary concise: approximately 15–35 words.
-- Write only the words the announcer should speak.
-- No quotation marks, labels, stage directions, or explanations.
+You are the energetic, authentic NBA-style announcer for ShootTheRock,
+a one-on-one basketball challenge against an NBA legend.
+Produce ONE natural, concise spoken announcement, based ONLY on the supplied facts.
+The input can specify an OPENING, GAMEPLAY, or GAME_OVER announcement.
+
+OPENING: Introduce the player and legend with excitement. Mention the rivalry
+record only if explicitly provided. Do not invent prior games.
+GAMEPLAY: React to the result with personality and appropriate energy.
+Acknowledge the legend's response when useful, and give accurate score context.
+Do NOT narrate the mechanics, location, or type of the shot just attempted.
+Do NOT sound like a coach; no pep talks or commands to make a shot.
+GAME_OVER: Announce the winner with dramatic energy and the actual final score.
+Never assign another shot. Mention rivalry history only if provided.
+
+IMPORTANT: If the input includes an EXACT_SHOT_INSTRUCTION line, do not
+repeat or paraphrase that instruction in your generated text. The server
+will append it verbatim to the spoken announcement after generation.
+End your generated text cleanly so the instruction follows naturally.
+Never invent a different winner, result, score, streak, or shot.
+Vary the rhythm, excitement, and phrasing. Routine moments should be natural;
+clutch moments and game winners should feel electric.
+Keep gameplay reactions about 12–25 words, openings and endings about 20–40.
+Write only the spoken words: no labels, quotes, or stage directions.
 `.trim();
 
 const ANNOUNCER_INSTRUCTIONS = `
-You are a professional NBA television play-by-play announcer
-calling a live one-on-one basketball game.
-Speak with a deep, rich, resonant American broadcast voice.
-Deliver commentary with natural rhythm, confidence, and personality.
-Build excitement as the action intensifies.
-Use dramatic pauses and explosive enthusiasm for scoring streaks,
-lead changes, and clutch moments.
-Sound like a genuine live sports broadcast, not an audiobook,
-commercial, or robotic narrator.
-Understand NBA basketball culture and deliver legendary player
-nicknames with familiarity and excitement.
-Never sound overly theatrical during routine plays.
+You are a professional American basketball broadcast announcer with a deep,
+rich, resonant voice. Sound genuinely engaged in a live one-on-one rivalry.
+React spontaneously to makes, misses, momentum, and the final result.
+Use controlled energy for routine moments and explosive excitement for
+clutch plays, comebacks, and game winners. Maintain natural rhythm.
+When the script ends with "First shot," or "Next shot,", shift smoothly
+into a clear, concise, matter-of-fact shot announcement, like a classic
+basketball game prompt. Do not make the shot instruction sound like coaching.
+Avoid theatrical overacting, audiobook delivery, or a robotic cadence.
 `.trim();
 
 function sha256(data: Buffer | string): Buffer {
@@ -81,6 +85,22 @@ async function openAIRequest(url: string, apiKey: string, body: Record<string, u
   }
 }
 
+// Optional structured instruction supported by the updated Swift client.
+// Keeping the original authenticated `text` field makes this compatible
+// with existing App Attest signature verification.
+function extractShotInstruction(context: string): string | null {
+  const matches = [...context.matchAll(/^EXACT_SHOT_INSTRUCTION:\s*(.+)$/gm)];
+  if (matches.length !== 1) return null;
+  const instruction = matches[0][1].trim();
+  if (!/^(First shot|Next shot),\s*[^\r\n]{3,140}\.$/i.test(instruction)) return null;
+  return instruction;
+}
+
+function extractMode(context: string): "OPENING" | "GAMEPLAY" | "GAME_OVER" | null {
+  const match = context.match(/^ANNOUNCEMENT_TYPE:\s*(OPENING|GAMEPLAY|GAME_OVER)\s*$/m);
+  return match ? (match[1] as "OPENING" | "GAMEPLAY" | "GAME_OVER") : null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -103,6 +123,15 @@ export async function POST(request: NextRequest) {
     const context = text.trim();
     if (!context || context.length > MAX_INPUT_LENGTH || keyId.length > 256 || challenge.length > 256 || assertion.length > 8192) {
       return jsonError("Invalid commentary request.", 400);
+    }
+
+    const mode = extractMode(context);
+    const instruction = extractShotInstruction(context);
+    if ((mode === "OPENING" || mode === "GAMEPLAY") && !instruction) {
+      return jsonError("Missing required shot instruction.", 400);
+    }
+    if (mode === "GAME_OVER" && instruction) {
+      return jsonError("Game over cannot include a next shot.", 400);
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey, {
@@ -144,8 +173,6 @@ export async function POST(request: NextRequest) {
       return jsonError("Invalid assertion signature.", 403);
     }
 
-    // The challenge endpoint stores SHA256 of the Base64URL challenge string.
-    // This RPC atomically consumes it and advances the monotonic assertion counter.
     const { data: consumed, error: consumeError } = await supabase.rpc("consume_ai_assertion", {
       p_key_id: keyId,
       p_challenge_hash: sha256(challenge).toString("hex"),
@@ -163,16 +190,30 @@ export async function POST(request: NextRequest) {
         { role: "system", content: WRITER_INSTRUCTIONS },
         { role: "user", content: context },
       ],
-      temperature: 0.9,
-      max_completion_tokens: 120,
+      temperature: 0.85,
+      max_completion_tokens: 150,
     });
     if (!writingResponse.ok) {
       console.error("Commentary writing failed:", writingResponse.status);
       return jsonError("Commentary writing failed.", 502);
     }
     const writingData = await writingResponse.json();
-    const commentary = writingData?.choices?.[0]?.message?.content?.trim();
-    if (typeof commentary !== "string" || !commentary.length || commentary.length > MAX_COMMENTARY_LENGTH) {
+    const generated = writingData?.choices?.[0]?.message?.content?.trim();
+    if (typeof generated !== "string" || !generated.length) {
+      return jsonError("Invalid AI commentary response.", 502);
+    }
+
+    // For new clients, append the exact game-selected shot instruction on the
+    // server, rather than trusting the language model to reproduce it.
+    let reaction = generated.replace(/^['"\s]+|['"\s]+$/g, "").trim();
+    if (instruction) {
+      const marker = reaction.search(/\b(?:First|Next) shot\s*[,.:]/i);
+      if (marker >= 0) reaction = reaction.slice(0, marker).trim();
+      reaction = reaction.replace(/[\s,;:]+$/, "");
+      if (!/[.!?]$/.test(reaction)) reaction += ".";
+    }
+    const commentary = instruction ? `${reaction} ${instruction}` : reaction;
+    if (!commentary.length || commentary.length > MAX_COMMENTARY_LENGTH) {
       return jsonError("Invalid AI commentary response.", 502);
     }
 
@@ -182,7 +223,7 @@ export async function POST(request: NextRequest) {
       input: commentary,
       instructions: ANNOUNCER_INSTRUCTIONS,
       response_format: "wav",
-      speed: 1.0,
+      speed: 1.15,
     });
     if (!speechResponse.ok) {
       console.error("Commentary speech failed:", speechResponse.status);
