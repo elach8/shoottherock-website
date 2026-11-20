@@ -1,12 +1,21 @@
 
 import { NextResponse } from "next/server";
-import { createHash, createPublicKey, verify } from "node:crypto";
+import {
+  createHash,
+  createPublicKey,
+  verify,
+} from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import cbor from "cbor";
 
 export const runtime = "nodejs";
 
-const APP_ID = `${process.env.APPLE_TEAM_ID}.${process.env.APPLE_BUNDLE_ID}`;
+const APP_ID =
+  `${process.env.APPLE_TEAM_ID}.${process.env.APPLE_BUNDLE_ID}`;
+
+function sha256(value: Buffer | string): Buffer {
+  return createHash("sha256").update(value).digest();
+}
 
 function decodeBase64(value: string): Buffer {
   return Buffer.from(
@@ -15,13 +24,10 @@ function decodeBase64(value: string): Buffer {
   );
 }
 
-function sha256(data: Buffer): Buffer {
-  return createHash("sha256").update(data).digest();
-}
-
 export async function POST(request: Request) {
   try {
-    const { keyId, assertion, challenge } = await request.json();
+    const { keyId, assertion, challenge } =
+      await request.json();
 
     if (
       typeof keyId !== "string" ||
@@ -58,8 +64,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const parsed = cbor.decodeFirstSync(decodeBase64(assertion));
-    const authenticatorData = Buffer.from(parsed.authenticatorData);
+    const parsed = cbor.decodeFirstSync(
+      decodeBase64(assertion)
+    );
+
+    const authenticatorData = Buffer.from(
+      parsed.authenticatorData
+    );
+
     const signature = Buffer.from(parsed.signature);
 
     if (authenticatorData.length < 37) {
@@ -69,10 +81,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const expectedRPID = sha256(Buffer.from(APP_ID));
-    const actualRPID = authenticatorData.subarray(0, 32);
+    const expectedRPID = sha256(APP_ID);
 
-    if (!actualRPID.equals(expectedRPID)) {
+    if (
+      !authenticatorData.subarray(0, 32)
+        .equals(expectedRPID)
+    ) {
       return NextResponse.json(
         { error: "App identifier mismatch" },
         { status: 403 }
@@ -88,23 +102,29 @@ export async function POST(request: Request) {
       );
     }
 
-    const clientDataHash = sha256(decodeBase64(challenge));
+    const clientDataHash = sha256(
+      decodeBase64(challenge)
+    );
 
+    // Preserve the signature verification that
+    // successfully passed on the iPhone.
     const nonce = sha256(
-  Buffer.concat([
-    authenticatorData,
-    clientDataHash,
-  ])
-);
+      Buffer.concat([
+        authenticatorData,
+        clientDataHash,
+      ])
+    );
 
-    const publicKey = createPublicKey(installation.public_key);
+    const publicKey = createPublicKey(
+      installation.public_key
+    );
 
     const valid = verify(
-  "sha256",
-  nonce,
-  publicKey,
-  signature
-);
+      "sha256",
+      nonce,
+      publicKey,
+      signature
+    );
 
     if (!valid) {
       return NextResponse.json(
@@ -113,19 +133,36 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error: updateError } = await supabase
-  .from("ai_app_installations")
-  .update({
-    sign_count: counter,
-    last_seen_at: new Date().toISOString(),
-  })
-  .eq("id", installation.id)
-  .lt("sign_count", counter);
+    // The challenge endpoint stores SHA-256 of
+    // the Base64URL challenge string, not its bytes.
+    const challengeHash = sha256(challenge)
+      .toString("hex");
 
-    if (updateError) {
+    // Atomically consume the challenge and
+    // advance the assertion counter.
+    const { data: consumed, error: consumeError } =
+      await supabase.rpc("consume_ai_assertion", {
+        p_key_id: keyId,
+        p_challenge_hash: challengeHash,
+        p_new_sign_count: counter,
+      });
+
+    if (consumeError) {
+      console.error(
+        "App Attest assertion consumption failed:",
+        consumeError
+      );
+
       return NextResponse.json(
-        { error: "Unable to update assertion counter" },
+        { error: "Assertion verification unavailable" },
         { status: 500 }
+      );
+    }
+
+    if (consumed !== true) {
+      return NextResponse.json(
+        { error: "Assertion expired or already used" },
+        { status: 403 }
       );
     }
 
